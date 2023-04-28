@@ -4,8 +4,10 @@ import pickle
 from data_cleaning import result_dic, characteristics
 from utils import clean_price_str
 
+models_dict = {"SGD Regressor ": "models/model_sgd.pkl", "Lasso" : "models/model_lso.pkl", "Random Forest Regressor" : "models/model_rdf.pkl"}
+model_choice = st.selectbox("Chose your model", models_dict)
 
-with open('models/model_sgd.pkl', 'rb') as file: #  <----- Choose your model by changing the file here
+with open(models_dict[model_choice], 'rb') as file:
     trained_pipe = pickle.load(file)
 
 

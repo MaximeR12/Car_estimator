@@ -11,23 +11,23 @@ from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 
-from sklearn.neighbors import KNeighborsRegressor
+
 from sklearn.linear_model import SGDRegressor, Lasso
 from sklearn.ensemble import RandomForestRegressor
 
 
 
-sgd = SGDRegressor()                        # 87.047%
-lso = Lasso(alpha=4)                        # 87.478%
-rdf = RandomForestRegressor(800)            # 95.287%
+sgd = [SGDRegressor(), "sgd"]                        # 87.047%
+lso = [Lasso(alpha=4), "lso"]                        # 87.478%
+rdf = [RandomForestRegressor(800), "rdf"]            # 95.287%
 
-model_to_use = rdf
+model_to_use = sgd # <-------- Here to change the model you want
 
 
 
 y = df['price']
 X = df[["brand", "wheelbase", "carlength", "carwidth", "carheight",	"curbweight",	"cylindernumber",	"enginesize",	"horsepower",	"consumption",  "fueltype","drivewheel", "aspiration" ,"doornumber" , "enginelocation"]]
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.80, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=42)
 
 
 ###############  Variables utilisées  ###################
@@ -41,7 +41,7 @@ numeric_transformer = Pipeline([
 
 ])
 
-categorical_transformer = OneHotEncoder(sparse_output=True)
+categorical_transformer = OneHotEncoder(sparse_output=True, handle_unknown="ignore")
 
 ################  PREPROCESSING  #######################
 preprocessor = ColumnTransformer(
@@ -53,17 +53,16 @@ preprocessor = ColumnTransformer(
 
 pipe = Pipeline([
     ('prep', preprocessor),
-    ('model', model_to_use)
+    ('model', model_to_use[0])
 ])
 
 trained_pipe = pipe.fit(X_train,y_train)
-# trained_pipe.predict
 score = trained_pipe.score(X_test,y_test)
 print("Score : {:.3%}".format(score))
 
 
 
 ##################  SAVE AS PICKLE  #####################
-with open('models/model_rdf.pkl', 'wb') as file:
+with open(f'models/model_{model_to_use[1]}.pkl', 'wb') as file:
     pickle.dump(trained_pipe, file)
 
